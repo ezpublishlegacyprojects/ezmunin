@@ -1,0 +1,91 @@
+#!/bin/sh
+# 
+# Plugin to monitor useful contents informations for an eZ Publish instance
+#
+# Usage: Link or copy into /etc/munin/<plugin-directory>/
+# After that you can configure the plugin by editing
+# your munin configuration file located here (on Debian)
+#
+# /etc/munin/plugin-conf.d/munin-node
+# 
+# and add the following lines : 
+# [ezpublish]
+# env.dbusername <dbusername>
+# env.dbpassword <dbpassword>
+# env.dbname <ezpublishdbname>
+#
+# and restart munin-node after that :
+#
+# sudo /etc/init.d/munin-node restart
+#
+#
+
+MYSQL_BIN="$(which mysql)"
+MYSQL_USER=$dbusername
+MYSQL_PASSWORD=$dbpassword
+EZPUBLISH_DATABASENAME=$dbname
+
+MYSQL="${MYSQL_BIN} -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" "${EZPUBLISH_DATABASENAME}""
+
+# {{{ variable declaration
+
+monitor_list[0]='ezco'   # eZContentObjects
+monitor_list[1]='ezcoa'  # eZContentObjectAttributes
+monitor_list[2]='ezcotn' # eZContentObjectTreeNode
+monitor_list[3]='ezcor'  # eZContentObjectRelations
+
+label_list[0]='Content objects'
+label_list[1]='Content object attributes'
+label_list[2]='Content nodes'
+label_list[3]='Content object relations'
+
+info_list[0]='eZ Publish content objects'
+info_list[1]='eZ Publish contentobject attributes'
+info_list[2]='eZ Publish contentobject tree node'
+info_list[3]='eZ Publish content object relations'
+
+query_list[0]='SELECT COUNT(id)      FROM ezcontentobject'
+query_list[1]='SELECT COUNT(id)      FROM ezcontentobject_attribute'
+query_list[2]='SELECT COUNT(node_id) FROM ezcontentobject_tree'
+query_list[3]='SELECT COUNT(id)      FROM ezcontentobject_link'
+
+# }}}
+
+# testing if everything is OK
+# in the configuration of this plugin
+if [ "$1" = "autoconf" ]; then
+	echo "yes"
+  	exit 0
+fi
+
+# If run with the "config"-parameter, give out information on how the
+# graphs should look. 
+if [ "$1" = "config" ]; then
+
+	echo 'graph_title Content statistics'
+
+	echo 'graph_args --base 1000'
+	echo 'graph_vlabel Values'
+	echo 'graph_scale no'
+
+	echo 'graph_category eZ Publish'
+
+	for ((i=0; i < ${#monitor_list[*]}; i++))
+	do
+		echo "${monitor_list[$i]}.label ${label_list[$i]}" 
+		echo "${monitor_list[$i]}.info ${info_list[$i]}"
+	done
+
+	echo 'graph_info Content statistics for an eZ Publish instance'
+
+	exit 0
+fi
+
+for ((i=0; i< ${#query_list[*]}; i++))
+do
+	sql_result="$(${MYSQL} -e "${query_list[$i]}")"
+	echo -n "${monitor_list[$i]}.value "
+	echo ${sql_result} | cut -d' ' -f 2
+done
+
+# vim: set fdm=marker:

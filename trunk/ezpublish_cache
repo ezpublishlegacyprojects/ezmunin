@@ -27,6 +27,7 @@ MYSQL_BIN="$(which mysql)"
 MYSQL_USER=$dbusername
 MYSQL_PASSWORD=$dbpassword
 EZPUBLISH_DATABASENAME=$dbname
+EZPUBLISH_INSTANCE="$(basename "$0")"
 
 MYSQL="${MYSQL_BIN} -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" "${EZPUBLISH_DATABASENAME}""
 
@@ -66,7 +67,7 @@ fi
 # graphs should look. 
 if [ "$1" = "config" ]; then
 
-    echo 'graph_title Cache statistics'
+    echo "graph_title ${EZPUBLISH_INSTANCE} : cache statistics"
 
     echo 'graph_args --base 1000'
     echo 'graph_vlabel Values'

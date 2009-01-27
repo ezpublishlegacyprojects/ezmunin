@@ -9,10 +9,11 @@
 # /etc/munin/plugin-conf.d/munin-node
 # 
 # and add the following lines : 
-# [ezpublish]
+#
+# [ezpublish_*]
 # env.dbusername <dbusername>
 # env.dbpassword <dbpassword>
-# env.dbname <ezpublishdbname>
+# env.dbname <ezpublishdbname>#
 #
 # and restart munin-node after that :
 #
@@ -51,41 +52,47 @@ query_list[3]='SELECT COUNT(id)      FROM ezcontentobject_link'
 
 # }}}
 
+# {{{ autoconf 
 # testing if everything is OK
 # in the configuration of this plugin
 if [ "$1" = "autoconf" ]; then
-	echo "yes"
-  	exit 0
+    echo "yes"
+    exit 0
 fi
+# }}}
 
+# {{{ config
 # If run with the "config"-parameter, give out information on how the
 # graphs should look. 
 if [ "$1" = "config" ]; then
 
-	echo 'graph_title Content statistics'
+    echo 'graph_title Content statistics'
 
-	echo 'graph_args --base 1000'
-	echo 'graph_vlabel Values'
-	echo 'graph_scale no'
+    echo 'graph_args --base 1000'
+    echo 'graph_vlabel Values'
+    echo 'graph_scale no'
 
-	echo 'graph_category eZ Publish'
+    echo 'graph_category eZ Publish'
 
-	for ((i=0; i < ${#monitor_list[*]}; i++))
-	do
-		echo "${monitor_list[$i]}.label ${label_list[$i]}" 
-		echo "${monitor_list[$i]}.info ${info_list[$i]}"
-	done
+    for ((i=0; i < ${#monitor_list[*]}; i++))
+    do
+        echo "${monitor_list[$i]}.label ${label_list[$i]}" 
+        echo "${monitor_list[$i]}.info ${info_list[$i]}"
+    done
 
-	echo 'graph_info Content statistics for an eZ Publish instance'
+    echo 'graph_info Content statistics for an eZ Publish instance'
 
-	exit 0
+    exit 0
 fi
+# }}}
 
+# {{{ real work
 for ((i=0; i< ${#query_list[*]}; i++))
 do
-	sql_result="$(${MYSQL} -e "${query_list[$i]}")"
-	echo -n "${monitor_list[$i]}.value "
-	echo ${sql_result} | cut -d' ' -f 2
+    sql_result="$(${MYSQL} -e "${query_list[$i]}")"
+    echo -n "${monitor_list[$i]}.value "
+    echo ${sql_result} | cut -d' ' -f 2
 done
+# }}}
 
-# vim: set fdm=marker:
+# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker:

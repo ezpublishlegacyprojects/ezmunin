@@ -35,21 +35,25 @@ monitor_list[0]='ezco'   # eZContentObjects
 monitor_list[1]='ezcoa'  # eZContentObjectAttributes
 monitor_list[2]='ezcotn' # eZContentObjectTreeNode
 monitor_list[3]='ezcor'  # eZContentObjectRelations
+monitor_list[4]='ezcod'  # eZContentObjectDrafts
 
 label_list[0]='Content objects'
 label_list[1]='Content object attributes'
 label_list[2]='Content nodes'
 label_list[3]='Content object relations'
+label_list[4]='Content object drafts'
 
 info_list[0]='eZ Publish content objects'
 info_list[1]='eZ Publish contentobject attributes'
 info_list[2]='eZ Publish contentobject tree node'
 info_list[3]='eZ Publish content object relations'
+info_list[4]='eZ Publish content object drafts'
 
 query_list[0]='SELECT COUNT(id)      FROM ezcontentobject'
 query_list[1]='SELECT COUNT(id)      FROM ezcontentobject_attribute'
 query_list[2]='SELECT COUNT(node_id) FROM ezcontentobject_tree'
 query_list[3]='SELECT COUNT(id)      FROM ezcontentobject_link'
+query_list[4]='SELECT COUNT(id)      FROM ezcontentobject WHERE STATUS=0'
 
 # }}}
 
